@@ -140,7 +140,7 @@ void ChainResampler::upinit(long const inRate,
 	// Spectral images above 20 kHz assumed inaudible
 	// this post-polyphase zero stuffing causes some power loss though.
 	{
-		int const div = outRate / std::max(inRate, 40000l);
+		int const div = static_cast<int>(outRate / std::max(inRate, 40000l));
 		if (div >= 2) {
 			list_.push_front(new Upsampler<channels>(div));
 			ratio /= div;

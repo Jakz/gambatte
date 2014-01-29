@@ -17,7 +17,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "blitterwrapper.h"
-#include "videolink/rgb32conv.h"
+#include "resample/src/videolink/rgb32conv.h"
 #include "videolink/vfilterinfo.h"
 #include "videolink/videolink.h"
 
