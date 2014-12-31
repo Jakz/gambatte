@@ -1,21 +1,21 @@
-/***************************************************************************
- *   Copyright (C) 2007 by Sindre Aamås                                    *
- *   sinamas@users.sourceforge.net                                         *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License version 2 as     *
- *   published by the Free Software Foundation.                            *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License version 2 for more details.                *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   version 2 along with this program; if not, write to the               *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+//
+//   Copyright (C) 2007 by sinamas <sinamas at users.sourceforge.net>
+//
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License version 2 as
+//   published by the Free Software Foundation.
+//
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License version 2 for more details.
+//
+//   You should have received a copy of the GNU General Public License
+//   version 2 along with this program; if not, write to the
+//   Free Software Foundation, Inc.,
+//   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
+
 #include "cpu.h"
 #include "memory.h"
 #include "savestate.h"
@@ -464,10 +464,11 @@ void CPU::loadState(SaveState const &state) {
 
 // CALLS, RESTARTS AND RETURNS:
 // call nn (24 cycles):
-// Push address of next instruction onto stack and then jump to address stored in next two bytes in memory:
+// Jump to 16-bit immediate operand and push return address onto stack:
 #define call_nn() do { \
-	PUSH(((pc + 2) >> 8) & 0xFF, (pc + 2) & 0xFF); \
+	unsigned const npc = (pc + 2) & 0xFFFF; \
 	jp_nn(); \
+	PUSH(npc >> 8, npc & 0xFF); \
 } while (0)
 
 // rst n (16 Cycles):
@@ -487,6 +488,7 @@ void CPU::loadState(SaveState const &state) {
 
 void CPU::process(unsigned long const cycles) {
 	mem_.setEndtime(cycleCounter_, cycles);
+	mem_.updateInput();
 
 	unsigned char a = a_;
 	unsigned long cycleCounter = cycleCounter_;

@@ -1,7 +1,6 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-Copyright (C) 2007 by Sindre Aamås
-sinamas@users.sourceforge.net
+Copyright (C) 2007 by sinamas <sinamas at users.sourceforge.net>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License version 2 as
@@ -21,13 +20,12 @@ Free Software Foundation, Inc.,
 
 About
 --------------------------------------------------------------------------------
-Gambatte is an open-source Game Boy Color emulator written for fun and made
-available in the hope that it will be useful. It is based on some stupid amount
-of hardware accuracy tests.
+Gambatte is a portable, open-source Game Boy Color emulator.
 
 The core emulation code is contained in a separate library backend
 (libgambatte) written in platform-independent C++. There is currently a Qt GUI
-frontend (gambatte_qt), and a simple command line SDL frontend (gambatte_sdl).
+frontend (gambatte_qt), and a simplistic command-line interface SDL frontend
+(gambatte_sdl).
 
 The Qt frontend has been ported to Windows, Mac OS X, and Linux/BSD/Unix-like
 OSes with audio/video engines utilizing native APIs on these platforms.

@@ -1,21 +1,21 @@
-/***************************************************************************
- *   Copyright (C) 2007-2010 by Sindre Aamås                               *
- *   sinamas@users.sourceforge.net                                         *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License version 2 as     *
- *   published by the Free Software Foundation.                            *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License version 2 for more details.                *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   version 2 along with this program; if not, write to the               *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+//
+//   Copyright (C) 2007-2010 by sinamas <sinamas at users.sourceforge.net>
+//
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License version 2 as
+//   published by the Free Software Foundation.
+//
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License version 2 for more details.
+//
+//   You should have received a copy of the GNU General Public License
+//   version 2 along with this program; if not, write to the
+//   Free Software Foundation, Inc.,
+//   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
+
 #include "cartridge.h"
 #include "file/file.h"
 #include "../savestate.h"
@@ -277,7 +277,7 @@ public:
 			break;
 		case 1:
 			rombank_ = data & 0x7F;
-			memptrs_.setRombank(rombank_ & (rombanks(memptrs_) - 1));
+			setRombank();
 			break;
 		case 2:
 			rambank_ = data;
@@ -302,7 +302,7 @@ public:
 		rambank_ = ss.rambank;
 		enableRam_ = ss.enableRam;
 		setRambank();
-		memptrs_.setRombank(rombank_ & (rombanks(memptrs_) - 1));
+		setRombank();
 	}
 
 private:
@@ -323,6 +323,10 @@ private:
 		}
 
 		memptrs_.setRambank(flags, rambank_ & (rambanks(memptrs_) - 1));
+	}
+
+	void setRombank() const {
+		memptrs_.setRombank(std::max(rombank_ & (rombanks(memptrs_) - 1), 1u));
 	}
 };
 
@@ -580,6 +584,8 @@ LoadRes Cartridge::loadROM(std::string const &romfile,
 		case 0x1C:
 		case 0x1D:
 		case 0x1E: type = type_mbc5; break;
+		case 0x20: return LOADRES_UNSUPPORTED_MBC_MBC6;
+		case 0x22: return LOADRES_UNSUPPORTED_MBC_MBC7;
 		case 0xFC: return LOADRES_UNSUPPORTED_MBC_POCKET_CAMERA;
 		case 0xFD: return LOADRES_UNSUPPORTED_MBC_TAMA5;
 		case 0xFE: return LOADRES_UNSUPPORTED_MBC_HUC3;
