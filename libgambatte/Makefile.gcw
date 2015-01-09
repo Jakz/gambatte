@@ -1,0 +1,63 @@
+.PHONY: all opt debug profile
+
+STRIP = mipsel-linux-strip
+CXX = mipsel-linux-g++
+CC = mipsel-linux-gcc
+
+SDL_CONFIG := sdl-config
+
+SYSROOT := $(shell $(CC) --print-sysroot)
+SDL_INCLUDES := $(shell $(SYSROOT)/usr/bin/sdl-config --cflags)
+SDL_LIBS := $(shell $(SYSROOT)/usr/bin/sdl-config --libs)
+
+CXXFLAGS = -std=c++11 -fPIC -fno-exceptions -fno-rtti
+CCFLAGS = $(SDL_INCLUDES) \
+	-I"./include/" \
+	-I"./src/" \
+	-I"../common/" \
+	-DHAVE_CSTDINT \
+	-fPIC \
+	-flto
+	
+LDFLAGS = -shared $(SDL_LIBS) -lz
+
+all opt debug:
+opt: CCFLAGS += -O3 -ffast-math
+debug: CCFLAGS += -g
+profile: CCFLAGS += -pg -O3 -ffast-math
+	
+VPATH = src
+
+BINDIR := obj
+BASESRC := src
+SOURCE := \
+	$(BASESRC) \
+	$(BASESRC)/file \
+	$(BASESRC)/file/unzip \
+	$(BASESRC)/mem \
+	$(BASESRC)/sound \
+	$(BASESRC)/video
+	
+SOURCES := $(patsubst $(BASESRC)/%, %, $(foreach dir, $(SOURCE), $(wildcard $(dir)/*.cpp)))
+CSOURCES := $(patsubst $(BASESRC)/%, %, $(foreach dir, $(SOURCE), $(wildcard $(dir)/*.c)))
+BINARIES := $(patsubst %.cpp, %.o, $(SOURCES))
+CBINARIES := $(patsubst %.c, %.o, $(CSOURCES))
+EXECUTABLE := gambatte.so
+
+all opt debug: $(EXECUTABLE)
+
+$(EXECUTABLE): $(addprefix $(BINDIR)/, $(BINARIES)) $(addprefix $(BINDIR)/, $(CBINARIES))
+	$(info $$LDFLAGS is [$(LDFLAGS)])
+	$(CXX) $(CCFLAGS) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
+
+clean:
+	rm -f $(EXECUTABLE)
+	rm -rf $(BINDIR)
+
+$(BINDIR)/%.o : $(BASESRC)/%.c
+	@test -d $(@D) || mkdir -p $(@D)
+	$(CC) -DMAKE -c $(CCFLAGS) $< -o $@
+
+$(BINDIR)/%.o : $(BASESRC)/%.cpp
+	@test -d $(@D) || mkdir -p $(@D)
+	$(CXX) -DMAKE -c $(CCFLAGS) $(CXXFLAGS) $< -o $@

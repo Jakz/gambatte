@@ -19,7 +19,7 @@
 #ifndef GAMBATTE_INT_H
 #define GAMBATTE_INT_H
 
-#ifdef HAVE_CSTDINT
+#if defined(HAVE_CSTDINT) || defined(__APPLE__)
 
 #include <cstdint>
 
