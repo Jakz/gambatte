@@ -47,7 +47,6 @@ EXECUTABLE := gambatte.so
 all opt debug: $(EXECUTABLE)
 
 $(EXECUTABLE): $(addprefix $(BINDIR)/, $(BINARIES)) $(addprefix $(BINDIR)/, $(CBINARIES))
-	$(info $$LDFLAGS is [$(LDFLAGS)])
 	$(CXX) $(CCFLAGS) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
 clean:

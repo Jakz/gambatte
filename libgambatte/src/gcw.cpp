@@ -2,6 +2,9 @@
 #define __GEEK_BOY_GCW_H__
 
 #include "../../../src/core/emu_interface.h"
+#include "../../../src/core/manager_interface.h"
+#include "../../../src/sfx/sfx.h"
+
 #include "../include/gambatte.h"
 
 using namespace gcw;
@@ -27,7 +30,6 @@ class GambatteCore : public CoreInterface, public InputGetter
 {
 private:
   GB gb;
-  u32* tmpAudio;
   
   std::size_t bufsamples = 0;
 	bool audioOutBufLow = false;
@@ -47,9 +49,7 @@ public:
     registerButton(ButtonSetting("Down", GCW_KEY_DOWN, KEY_DOWN, true));
     
     setGfxFormat(160, 144, FORMAT_8888);
-    
-    
-    tmpAudio = new u32[AUDIO_SAMPLES_PER_FRAME + AUDIO_SAMPLES_ADDITIONAL];
+    setSfxFormat(SfxAudioSpec(4,(AUDIO_SAMPLES_PER_FRAME + AUDIO_SAMPLES_ADDITIONAL), 44100));
   }
   
   unsigned operator()() override { return buttonStatus; }
@@ -61,16 +61,22 @@ public:
     while (vidFrameDoneSampleCnt < 0)
     {
       std::size_t runsamples = AUDIO_SAMPLES_PER_FRAME - bufsamples;
-      vidFrameDoneSampleCnt = gb.runFor(reinterpret_cast<gambatte::uint_least32_t*>(gfxBuffer.data), gfxBuffer.width, reinterpret_cast<gambatte::uint_least32_t*>(tmpAudio), runsamples);
+      vidFrameDoneSampleCnt = gb.runFor(reinterpret_cast<gambatte::uint_least32_t*>(gfxBuffer.data), gfxBuffer.width, reinterpret_cast<u32*>(audioBuffer) + bufsamples, runsamples);
       std::size_t const outsamples = vidFrameDoneSampleCnt >= 0 ? bufsamples + vidFrameDoneSampleCnt : bufsamples + runsamples;
       bufsamples += runsamples;
       bufsamples -= outsamples;
+      
+      
+      AudioStatus const &astatus = manager->writeAudioSamples(outsamples, bufsamples);
+			audioOutBufLow = astatus.low;
     }
   }
   
   void loadRomByFileName(const std::string& name) override
   {
     gb.load(name);
+    SDL_PauseAudio(0);
+
   }
   
   void emulationSuspended() override { }
