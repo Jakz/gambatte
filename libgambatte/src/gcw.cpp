@@ -2,7 +2,6 @@
 #define __GEEK_BOY_GCW_H__
 
 #include "../../../src/core/emu_interface.h"
-#include "../../../src/core/manager_interface.h"
 #include "../../../src/sfx/sfx.h"
 
 #include "../include/gambatte.h"
@@ -66,8 +65,7 @@ public:
       bufsamples += runsamples;
       bufsamples -= outsamples;
       
-      
-      AudioStatus const &astatus = manager->writeAudioSamples(outsamples, bufsamples);
+      AudioStatus const &astatus = writeAudioSamples(outsamples, bufsamples);
 			audioOutBufLow = astatus.low;
     }
   }
@@ -75,8 +73,6 @@ public:
   void loadRomByFileName(const std::string& name) override
   {
     gb.load(name);
-    SDL_PauseAudio(0);
-
   }
   
   void emulationSuspended() override { }
@@ -96,6 +92,9 @@ public:
   void reset() override
   {
     gb.reset();
+    audioOutBufLow = false;
+    bufsamples = 0;
+    buttonStatus = 0;
   }
   
   
