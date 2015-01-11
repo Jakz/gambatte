@@ -102,6 +102,16 @@ public:
 
 static GambatteCore emulator;
 
+__attribute__((constructor)) void antani()
+{
+
+}
+
+__attribute__((destructor)) void antanium()
+{
+
+}
+
 extern "C" CoreInterface* retrieve()
 {
   return &emulator;
