@@ -77,7 +77,7 @@ public:
   
   void emulationSuspended() override { }
   void emulationResumed() override { }
-  
+  void emulationStopped() override { }
   void emulationStarted() override { }
   
   void initialize() {
@@ -88,7 +88,7 @@ public:
   {
     
   }
-  
+
   void reset() override
   {
     gb.reset();
@@ -102,12 +102,12 @@ public:
 
 static GambatteCore emulator;
 
-__attribute__((constructor)) void antani()
+__attribute__((constructor)) void onLoad()
 {
 
 }
 
-__attribute__((destructor)) void antanium()
+__attribute__((destructor)) void onUnload()
 {
 
 }
