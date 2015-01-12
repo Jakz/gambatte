@@ -39,7 +39,9 @@ public:
   {
     registerInformations({System::Type::GAME_BOY, System::Type::GAME_BOY_COLOR}, "gambatte", "Gambatte", "1.0");
     
-    registerFeature(CoreFeature::CAN_SAVE_STATES);
+    registerFeature(CoreFeature::CAN_SAVE_STATE);
+    registerFeature(CoreFeature::CAN_SOFT_RESET);
+    registerFeature(CoreFeature::CAN_SAVE_RAM);
     
     registerButton(ButtonSetting("A", GCW_KEY_A, KEY_A, true));
     registerButton(ButtonSetting("B", GCW_KEY_B, KEY_B, true));
@@ -93,8 +95,17 @@ public:
     gb.loadState(path);
   }
   
+  void sramSetPath(const string& path) override { gb.setSaveDir(path); }
+  void sramSaveTo(const std::string& path, const std::string& romName) override { gb.saveSavedata(); }
+  void sramLoadFrom(const std::string& path, const std::string& romName) override { /* implicit on rom load */ }
+  
   void initialize() {
     gb.setInputGetter(this);
+  }
+  
+  void softReset() override
+  {
+    gb.reset();
   }
 
   void releaseResources() override
