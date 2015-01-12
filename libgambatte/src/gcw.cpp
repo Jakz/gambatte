@@ -8,6 +8,7 @@
 
 using namespace gcw;
 using namespace gambatte;
+using namespace std;
 
 /* shifts as defined in inputgetter.h */
 enum KeyShift
@@ -22,8 +23,8 @@ enum KeyShift
   KEY_DOWN = 7
 };
 
-static std::size_t const AUDIO_SAMPLES_PER_FRAME = 35112;
-static std::size_t const AUDIO_SAMPLES_ADDITIONAL = 2064;
+constexpr size_t AUDIO_SAMPLES_PER_FRAME = 35112;
+constexpr size_t AUDIO_SAMPLES_ADDITIONAL = 2064;
 
 class GambatteCore : public CoreInterface, public InputGetter
 {
@@ -37,6 +38,8 @@ public:
   GambatteCore()
   {
     registerInformations({System::Type::GAME_BOY, System::Type::GAME_BOY_COLOR}, "gambatte", "Gambatte", "1.0");
+    
+    registerFeature(CoreFeature::CAN_SAVE_STATES);
     
     registerButton(ButtonSetting("A", GCW_KEY_A, KEY_A, true));
     registerButton(ButtonSetting("B", GCW_KEY_B, KEY_B, true));
@@ -55,13 +58,13 @@ public:
   
   void emulationFrame() override
   {
-    std::ptrdiff_t vidFrameDoneSampleCnt = -1;
+    ptrdiff_t vidFrameDoneSampleCnt = -1;
     
     while (vidFrameDoneSampleCnt < 0)
     {
-      std::size_t runsamples = AUDIO_SAMPLES_PER_FRAME - bufsamples;
+      size_t runsamples = AUDIO_SAMPLES_PER_FRAME - bufsamples;
       vidFrameDoneSampleCnt = gb.runFor(reinterpret_cast<gambatte::uint_least32_t*>(gfxBuffer.data), gfxBuffer.width, reinterpret_cast<u32*>(audioBuffer) + bufsamples, runsamples);
-      std::size_t const outsamples = vidFrameDoneSampleCnt >= 0 ? bufsamples + vidFrameDoneSampleCnt : bufsamples + runsamples;
+      size_t const outsamples = vidFrameDoneSampleCnt >= 0 ? bufsamples + vidFrameDoneSampleCnt : bufsamples + runsamples;
       bufsamples += runsamples;
       bufsamples -= outsamples;
       
@@ -70,7 +73,7 @@ public:
     }
   }
   
-  void loadRomByFileName(const std::string& name) override
+  void loadRomByFileName(const string& name) override
   {
     gb.load(name);
   }
@@ -79,6 +82,16 @@ public:
   void emulationResumed() override { }
   void emulationStopped() override { }
   void emulationStarted() override { }
+  
+  void stateSaveTo(const string& path) override
+  {
+    gb.saveState(nullptr, 0, path);
+  }
+  
+  void stateLoadFrom(const string& path) override
+  {
+    gb.loadState(path);
+  }
   
   void initialize() {
     gb.setInputGetter(this);
