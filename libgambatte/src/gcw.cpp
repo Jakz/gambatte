@@ -52,7 +52,7 @@ public:
     registerButton(ButtonSetting("Left", GCW_KEY_LEFT, KEY_LEFT, true));
     registerButton(ButtonSetting("Down", GCW_KEY_DOWN, KEY_DOWN, true));
     
-    setGfxFormat(160, 144, FORMAT_8888);
+    setGfxFormat(160, 144, FORMAT_XRGB888);
     setSfxFormat(SfxAudioSpec(4,(AUDIO_SAMPLES_PER_FRAME + AUDIO_SAMPLES_ADDITIONAL), 44100));
   }
   
